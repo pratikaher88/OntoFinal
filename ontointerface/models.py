@@ -17,6 +17,27 @@ class NeuroData(models.Model):
     scan_results = models.CharField(max_length=500, blank = True)
     neuro_sugery_details = models.CharField(max_length=500, blank = True)
 
+INQUIRER_CHOICES = (
+    ('Admin','ADMIN'),
+    ('JUNIOR NURSE', 'JUNIOR NURSE'),
+    ('Surgeon','SURGEON'),
+)
+
+DATA_CHOICES = (
+    ('Neuraldata','NEURODATA'),
+    ('Pediatricdata', 'PEDIATRIC DATA'),
+    ('Gynaecdata','Gynac Data'),
+)
+
+class UserInputFormModel(models.Model):
+
+    patient_id = models.CharField(max_length=500)
+    inquirer = models.CharField(max_length=100, choices=INQUIRER_CHOICES, default='ADMIN')
+    data_requested = models.CharField(max_length=100, choices=DATA_CHOICES, default='Neuraldata')
+
+    
+    
+
 
 
 

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<br>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }}">
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+
+
+<div class="content-section">
+
+    <form method="POST" novalidate>
+        {% csrf_token %}
+
+        <div class="fieldWrapper">
+            {{ form.patient_id | as_crispy_field }}
+        </div>
+
+        <div class="fieldWrapper">
+            {{ form.inquirer | as_crispy_field }}
+        </div>
+
+        <div class="fieldWrapper">
+            {{ form.data_requested | as_crispy_field }}
+        </div>
+
+<br>
+<div class="form-group">
+    <button class="btn btn-outline-info" type="submit" name="submitentry">SUBMIT</button>
+</div>
+
+</form>
+
+</div>
+
+
+
+
+{% endblock content %}
