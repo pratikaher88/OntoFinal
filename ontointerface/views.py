@@ -16,7 +16,12 @@ class SparqlQueries:
         resultsList = self.graph.query(query)
         return resultsList
 
+
 def index(request):
+
+    return render(request,'display_quotes.html')
+
+def query_output(request):
 
     query = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "\
             "ask { "\
@@ -34,6 +39,6 @@ def index(request):
     resultsList= list(response)[0]
 
     print(resultsList)
-
+    
 
     return HttpResponse(resultsList)
