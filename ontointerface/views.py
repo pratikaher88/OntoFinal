@@ -3,10 +3,14 @@ from django.urls import reverse
 
 # Create your views here.
 from django.http import HttpResponse
-from .models import UserInputFormModel
+from .models import UserInputFormModel, NeuroData
 from .forms import UserInputForm
 
 from owlready2 import *
+
+switcher = {
+    'Neuraldata': NeuroData,
+}
 
 
 class SparqlQueries:
@@ -59,7 +63,10 @@ def index(request):
             access_result = True
 
             if access_result:
-                return access_granted(request,pid=1)
+                pid = form.cleaned_data['patient_id']
+                data_requested = form.cleaned_data['data_requested']
+
+                return access_granted(request, pid, data_requested)
                 # ={'product_id': 1})
             else:
                 return redirect('ontointerface:access_denied')
@@ -77,9 +84,18 @@ def access_denied(request):
     return render(request, 'access_denied.html')
 
 
-def access_granted(request, pid):
+def access_granted(request, pid, data_requested):
 
     print("PID", pid)
+
+    print("data_requested", data_requested)
+
+    requested_object = switcher[data_requested]
+    
+    hopital1_data = requested_object.objects.using('legacy_users').filter(patient_id=pid)
+
+    hospital2_data = requested_object.objects.using(
+        'hospital2').filter(patient_id=pid)
 
     return render(request, 'access_granted.html')
 
