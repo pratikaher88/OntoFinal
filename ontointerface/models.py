@@ -10,12 +10,12 @@ from django.db import models
 class NeuroData(models.Model):
 
     patient_id = models.CharField(max_length=500)
-    date = models.CharField(max_length=500, blank = True)
-    doctor_id = models.CharField(max_length=500, blank = True)
-    doctors_note = models.CharField(max_length=500, blank = True)
-    lab_results = models.CharField(max_length=500, blank = True)
-    scan_results = models.CharField(max_length=500, blank = True)
-    neuro_sugery_details = models.CharField(max_length=500, blank = True)
+    date = models.CharField(max_length=500, blank = True, null = True)
+    doctor_id = models.CharField(max_length=500, blank = True, null = True)
+    doctors_note = models.CharField(max_length=500, blank = True, null = True)
+    lab_results = models.CharField(max_length=500, blank = True, null = True)
+    scan_results = models.CharField(max_length=500, blank = True, null = True)
+    neuro_sugery_details = models.CharField(max_length=500, blank = True, null = True)
 
 INQUIRER_CHOICES = (
     ('Admin','ADMIN'),

@@ -76,9 +76,9 @@ WSGI_APPLICATION = 'Ontodesign.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {},
+    'default': {},
 
-    'default': {
+    'hospital1': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'hospital1',
         'USER': 'paher',
@@ -159,3 +159,14 @@ STATIC_URL = '/static/'
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
+
+
+# IP
+GET_LOCATION_BY_IP = 'http://ipinfo.io/json'
+
+# CENTER POINT OF DISASTER
+CENTER_POINT_LAT = 19.1728
+CENTER_POINT_LONG = 72.8826
+
+# RADIUS
+RADIUS = 100

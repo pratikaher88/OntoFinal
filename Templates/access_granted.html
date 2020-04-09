@@ -5,6 +5,51 @@
 
 <h2>Access granted</h2>
 
+<br/>
 
+
+{% if total_data %}
+
+<table class="table">
+    <thead class="thead-dark">
+
+        <tr>
+            <th scope="col">Patient ID</th>
+            <th scope="col">Date</th>
+            <th scope="col">Total Pass</th>
+            <th scope="col">Total Verify</th>
+            <th scope="col">Total Violations</th>
+            <th scope="col">Score</th>
+            <th scope="col">Score</th>
+
+        </tr>
+    </thead>
+    <tbody>
+
+{% for value in total_data %}
+
+    <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <th scope="row">{{ value.patient_id }}</th>
+        <th scope="row">{{ value.patient_id }}</th>
+        <th scope="row">{{ value.date }}</th>
+        <th scope="row">{{ value.date }}</th>
+        <th scope="row">{{ value.date }}</th>
+        <th scope="row">{{ value.date }}</th>
+
+    </tr>
+        
+    {% endfor %}
+
+    </tbody>
+</table>
+
+
+
+{% else %}
+
+<h4>No records available for this patient</h4>
+
+{% endif %}
 
 {% endblock content %}

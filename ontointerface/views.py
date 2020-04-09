@@ -1,16 +1,51 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
-
+import requests
 # Create your views here.
 from django.http import HttpResponse
 from .models import UserInputFormModel, NeuroData
 from .forms import UserInputForm
+from Ontodesign.settings import GET_LOCATION_BY_IP, CENTER_POINT_LAT, CENTER_POINT_LONG, RADIUS
+from math import radians, cos, sin, asin, sqrt
+from itertools import chain
 
 from owlready2 import *
 
 switcher = {
     'Neuraldata': NeuroData,
 }
+
+def location_lookup():
+
+     r = requests.get(GET_LOCATION_BY_IP).json()
+     return r['loc'].split(',')
+
+def is_inside():
+
+    location = location_lookup()
+
+    center_point = [{'lat': CENTER_POINT_LAT, 'lng': CENTER_POINT_LONG}]
+    test_point = [{'lat': float(location[0]), 'lng': float(location[1])}]
+
+    lat1 = center_point[0]['lat']
+    lon1 = center_point[0]['lng']
+    lat2 = test_point[0]['lat']
+    lon2 = test_point[0]['lng']
+
+    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * asin(sqrt(a))
+    r = 6371 
+
+    # print(c*r)
+
+    if c*r <= RADIUS:
+         return True
+    else:
+         return False
 
 
 class SparqlQueries:
@@ -26,7 +61,7 @@ class SparqlQueries:
         resultsList = self.graph.query(query)
         return resultsList
 
-def query_output(request):
+def query_output():
 
     query = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "\
             "ask { "\
@@ -43,10 +78,12 @@ def query_output(request):
 
     resultsList= list(response)[0]
 
-    print(resultsList)
+    # print(resultsList)
+
+    return resultsList
     
 
-    return HttpResponse(resultsList)
+    # return HttpResponse(resultsList)
 
 
 def index(request):
@@ -60,9 +97,9 @@ def index(request):
             # access_result = CheckOntologyForAccess()
 
             # kwargs={"pid": form.cleaned_data['patient_id']}
-            access_result = True
+            access_result = query_output()
 
-            if access_result:
+            if query_output() and is_inside():
                 pid = form.cleaned_data['patient_id']
                 data_requested = form.cleaned_data['data_requested']
 
@@ -92,11 +129,20 @@ def access_granted(request, pid, data_requested):
 
     requested_object = switcher[data_requested]
     
-    hopital1_data = requested_object.objects.using('legacy_users').filter(patient_id=pid)
+    hospital1_data = requested_object.objects.using('hospital1').filter(patient_id=pid)
 
-    hospital2_data = requested_object.objects.using(
-        'hospital2').filter(patient_id=pid)
+    hospital2_data = requested_object.objects.using('hospital2').filter(patient_id=pid)
 
-    return render(request, 'access_granted.html')
+    # print(hospital1_data, hospital2_data)
+
+    field_names = requested_object._meta.fields
+
+    # print(field_names[0].split('.')[-1])
+
+    total_data = hospital1_data | hospital2_data
+
+    total_data = (list(chain(hospital1_data, hospital2_data)))
+
+    return render(request, 'access_granted.html', {'total_data': total_data, 'field_names' : field_names})
 
 
