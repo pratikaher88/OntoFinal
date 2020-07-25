@@ -17,6 +17,10 @@ class NeuroData(models.Model):
     scan_results = models.CharField(max_length=500, blank = True, null = True)
     neuro_sugery_details = models.CharField(max_length=500, blank = True, null = True)
 
+    def __str__(self):
+
+        return self.patient_id + '-' +self.doctor_id
+
 INQUIRER_CHOICES = (
     ('Admin','ADMIN'),
     ('JUNIOR NURSE', 'JUNIOR NURSE'),

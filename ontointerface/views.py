@@ -15,6 +15,7 @@ switcher = {
     'Neuraldata': NeuroData,
 }
 
+
 def location_lookup():
 
      r = requests.get(GET_LOCATION_BY_IP).json()
@@ -52,8 +53,15 @@ class SparqlQueries:
     def __init__(self):
         my_world = World()
         # path to the owl file is given here
-        my_world.get_ontology(
-            "/Users/pratikaher/ontologies/Owl-Ontology/trail.owl").load()
+
+        try:
+            my_world.get_ontology(
+                        "/Users/pratikaher/ontologies/TT2.owl").load()
+        except:
+            my_world.get_ontology(
+                        "/Users/pratikaher/ontologies/TT2.owl").load()
+
+        
         sync_reasoner(my_world)  # reasoner is started and synchronized here
         self.graph = my_world.as_rdflib_graph()
 
@@ -63,15 +71,29 @@ class SparqlQueries:
 
 def query_output():
 
-    query = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "\
-            "ask { "\
-            "?isManagedBy rdfs:domain ?A ." \
-            "?isManagedBy rdfs:range ?B " \
-            "}"
+    # query = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "\
+    #         "ask { "\
+    #         "?isManagedBy rdfs:domain ?A ." \
+    #         "?isManagedBy rdfs:range ?B " \
+    #         "}"
     
     # query = "PREFIX owl: <http://www.w3.org/2002/07/owl#> "\
     #         "SELECT DISTINCT ?p "\
     #         "WHERE {?p a owl:ObjectProperty}"
+
+    query = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "\
+            "PREFIX owl: <http://www.w3.org/2002/07/owl#>"\
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"\
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>"\
+            "ASK{"\
+            "select ?domain ?property ?range  where {"\
+            "  ?property rdfs:domain ?domain ;"\
+            "            rdfs:range ?range ."\
+            "FILTER (regex(str(?domain), \"Inquirer\"))"\
+            "FILTER (regex(str(?property), \"canAccessCardio\"))"\
+            "FILTER (regex(str(?property), \"Cardio\"))"\
+            "}"\
+            "}"
 
     runQuery = SparqlQueries()
     response = runQuery.search(query)
@@ -82,7 +104,6 @@ def query_output():
 
     return resultsList
     
-
     # return HttpResponse(resultsList)
 
 
@@ -129,6 +150,16 @@ def access_granted(request, pid, data_requested):
 
     requested_object = switcher[data_requested]
     
+    # hospital1_data = requested_object.objects.filter(patient_id=pid)
+
+    # p = requested_object('111','222','01-01-2020', 'this is it','dsfs dsfg','sdfsfd sdf','fsd ddfg')
+
+    # p.save()
+
+    # print(hospital1_data)
+    # print(requested_object.objects.all())
+
+
     hospital1_data = requested_object.objects.using('hospital1').filter(patient_id=pid)
 
     hospital2_data = requested_object.objects.using('hospital2').filter(patient_id=pid)
@@ -137,12 +168,16 @@ def access_granted(request, pid, data_requested):
 
     field_names = requested_object._meta.fields
 
-    # print(field_names[0].split('.')[-1])
+    # # print(field_names[0].split('.')[-1])
 
-    total_data = hospital1_data | hospital2_data
+    # total_data = hospital1_data | hospital2_data
 
     total_data = (list(chain(hospital1_data, hospital2_data)))
 
-    return render(request, 'access_granted.html', {'total_data': total_data, 'field_names' : field_names})
+    print(total_data)
+
+    return render(request, 'access_granted.html', {'hospital1_data': hospital1_data, 'hospital2_data': hospital2_data, 'field_names' : field_names})
+
+    # return render(request, 'access_granted.html', {'total_data': total_data, 'field_names' : field_names})
 
 
