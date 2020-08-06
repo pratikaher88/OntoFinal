@@ -21,6 +21,21 @@ class NeuroData(models.Model):
 
         return self.patient_id + '-' +self.doctor_id
 
+
+class CardioData(models.Model):
+
+    patient_id = models.CharField(max_length=500)
+    date = models.CharField(max_length=500, blank = True, null = True)
+    doctor_id = models.CharField(max_length=500, blank = True, null = True)
+    doctors_note = models.CharField(max_length=500, blank = True, null = True)
+    lab_results = models.CharField(max_length=500, blank = True, null = True)
+    scan_results = models.CharField(max_length=500, blank = True, null = True)
+    neuro_sugery_details = models.CharField(max_length=500, blank = True, null = True)
+
+    def __str__(self):
+
+        return self.patient_id + '-' +self.doctor_id
+
 INQUIRER_CHOICES = (
     ('Admin','ADMIN'),
     ('JUNIOR NURSE', 'JUNIOR NURSE'),
@@ -31,6 +46,7 @@ DATA_CHOICES = (
     ('Neuraldata','NEURODATA'),
     ('Pediatricdata', 'PEDIATRIC DATA'),
     ('Gynaecdata','Gynac Data'),
+    ('Cardio','CardioData'),
 )
 
 class UserInputFormModel(models.Model):

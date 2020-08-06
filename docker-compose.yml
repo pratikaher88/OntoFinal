@@ -26,6 +26,39 @@ services:
       - "5434:5432"
     restart: on-failure
 
+  mongodb:
+    image: mongo
+    restart: always
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d
+      - ./data-db:/data/db
+    environment:
+      MONGODB_USERNAME: root
+      MONGODB_PASSWORD: mongoadmin
+      MONGODB_DATABASE: django_mongodb_docker
+    ports:
+      - 27017:27017
+
+  # web:
+  #   build : .
+  #   restart: always
+  #   command: python manage.py runserver 0.0.0.0:8000
+  #   ports:
+  #     - 8000:8000
+  #   links:
+  #     - mongodb
+
+
+  # migration:
+  #   build: .
+  #   command: python manage.py migrate --database=hospital2 && python manage.py migrate --database=hospital1 && python manage.py migrate --database=mongo
+  #   volumes:
+  #     - .:/django_mongodb_docker
+  #   links:
+  #     - mongodb
+  #   depends_on:
+  #     - web
+
   # django_app:
   #   build: ./
   #   container_name: django_app

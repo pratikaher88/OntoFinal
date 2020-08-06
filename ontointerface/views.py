@@ -3,7 +3,7 @@ from django.urls import reverse
 import requests
 # Create your views here.
 from django.http import HttpResponse
-from .models import UserInputFormModel, NeuroData
+from .models import UserInputFormModel, NeuroData, CardioData
 from .forms import UserInputForm
 from Ontodesign.settings import GET_LOCATION_BY_IP, CENTER_POINT_LAT, CENTER_POINT_LONG, RADIUS
 from math import radians, cos, sin, asin, sqrt
@@ -13,6 +13,7 @@ from owlready2 import *
 
 switcher = {
     'Neuraldata': NeuroData,
+    'Cardio' : CardioData
 }
 
 
@@ -69,7 +70,7 @@ class SparqlQueries:
         resultsList = self.graph.query(query)
         return resultsList
 
-def query_output():
+def query_output(data_requested = "Cardio", inquirer = "Inquirer"):
 
     # query = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "\
     #         "ask { "\
@@ -81,6 +82,8 @@ def query_output():
     #         "SELECT DISTINCT ?p "\
     #         "WHERE {?p a owl:ObjectProperty}"
 
+    print(data_requested, inquirer)
+    
     query = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "\
             "PREFIX owl: <http://www.w3.org/2002/07/owl#>"\
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"\
@@ -93,7 +96,9 @@ def query_output():
             "FILTER (regex(str(?property), \"canAccessCardio\"))"\
             "FILTER (regex(str(?property), \"Cardio\"))"\
             "}"\
-            "}"
+            "}"\
+
+    print(query)
 
     runQuery = SparqlQueries()
     response = runQuery.search(query)
@@ -118,12 +123,16 @@ def index(request):
             # access_result = CheckOntologyForAccess()
 
             # kwargs={"pid": form.cleaned_data['patient_id']}
-            access_result = query_output()
+            # access_result = query_output()
 
-            if query_output() and is_inside():
-                pid = form.cleaned_data['patient_id']
-                data_requested = form.cleaned_data['data_requested']
+            pid = form.cleaned_data['patient_id']
+            data_requested = form.cleaned_data['data_requested']
+            inquirer = form.cleaned_data['inquirer']
 
+
+
+            if query_output(data_requested, "Inquirer") and is_inside():
+                
                 return access_granted(request, pid, data_requested)
                 # ={'product_id': 1})
             else:
@@ -164,6 +173,8 @@ def access_granted(request, pid, data_requested):
 
     hospital2_data = requested_object.objects.using('hospital2').filter(patient_id=pid)
 
+    mongo_data = requested_object.objects.using('mongo').filter(patient_id=pid)
+
     # print(hospital1_data, hospital2_data)
 
     field_names = requested_object._meta.fields
@@ -172,11 +183,11 @@ def access_granted(request, pid, data_requested):
 
     # total_data = hospital1_data | hospital2_data
 
-    total_data = (list(chain(hospital1_data, hospital2_data)))
+    total_data = (list(chain(hospital1_data, hospital2_data, mongo_data)))
 
     print(total_data)
 
-    return render(request, 'access_granted.html', {'hospital1_data': hospital1_data, 'hospital2_data': hospital2_data, 'field_names' : field_names})
+    return render(request, 'access_granted.html', {'hospital1_data': hospital1_data, 'hospital2_data': hospital2_data, 'mongo_data' : mongo_data, 'field_names' : field_names})
 
     # return render(request, 'access_granted.html', {'total_data': total_data, 'field_names' : field_names})
 
