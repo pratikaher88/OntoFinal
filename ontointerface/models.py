@@ -16,6 +16,7 @@ class NeuroData(models.Model):
     lab_results = models.CharField(max_length=500, blank = True, null = True)
     scan_results = models.CharField(max_length=500, blank = True, null = True)
     neuro_sugery_details = models.CharField(max_length=500, blank = True, null = True)
+    hospital_name = models.CharField(max_length=500, blank = True, null = True,default='Hospital1')
 
     def __str__(self):
 

@@ -8,6 +8,7 @@ from .forms import UserInputForm
 from Ontodesign.settings import GET_LOCATION_BY_IP, CENTER_POINT_LAT, CENTER_POINT_LONG, RADIUS
 from math import radians, cos, sin, asin, sqrt
 from itertools import chain
+from ontointerface.dataprocessed import data_processed
 
 from owlready2 import *
 
@@ -70,6 +71,7 @@ class SparqlQueries:
         resultsList = self.graph.query(query)
         return resultsList
 
+
 def query_output(data_requested = "Cardio", inquirer = "Inquirer"):
 
     # query = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "\
@@ -130,8 +132,7 @@ def index(request):
             inquirer = form.cleaned_data['inquirer']
 
 
-
-            if query_output(data_requested, "Inquirer") and is_inside():
+            if query_output(data_requested, "Inquirer") and is_inside() and data_processed(inquirer):
                 
                 return access_granted(request, pid, data_requested)
                 # ={'product_id': 1})
@@ -187,8 +188,8 @@ def access_granted(request, pid, data_requested):
 
     print(total_data)
 
-    return render(request, 'access_granted.html', {'hospital1_data': hospital1_data, 'hospital2_data': hospital2_data, 'mongo_data' : mongo_data, 'field_names' : field_names})
+    # return render(request, 'access_granted.html', {'hospital1_data': hospital1_data, 'hospital2_data': hospital2_data, 'mongo_data' : mongo_data, 'field_names' : field_names})
 
-    # return render(request, 'access_granted.html', {'total_data': total_data, 'field_names' : field_names})
+    return render(request, 'access_granted_final.html', {'total_data': total_data, 'field_names' : field_names})
 
 

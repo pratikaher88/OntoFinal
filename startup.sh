@@ -1,3 +1,4 @@
+source newenv/bin/activate
 docker-compose up -d
 python manage.py migrate --database=hospital1
 python manage.py migrate --database=hospital2

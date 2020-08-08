@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<br>
+
+
+<h2>Access granted</h2>
+
+<br/>
+
+<p>The patient records are as follows :</p>
+
+<hr/>
+
+{% if total_data %}
+
+<br/>
+
+<table class="table">
+    <thead class="thead-dark">
+
+        <tr>
+            <th scope="col">Sr. No</th>
+            <th scope="col">Patient ID</th>
+            <th scope="col">Doctor ID</th>
+            <th scope="col">Date</th>
+            <th scope="col">Doctors Note</th>
+            <th scope="col">Lab Results</th>
+            <th scope="col">Scan Results</th>
+            <th scope="col">Neuro Sugery Details</th>
+            <th scope="col">Hospital Name</th>
+
+        </tr>
+    </thead>
+    <tbody>
+
+{% for value in total_data %}
+
+    <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <th scope="row">{{ value.patient_id }}</th>
+        <th scope="row">{{ value.doctor_id }}</th>
+        <th scope="row">{{ value.date }}</th>
+        <th scope="row">{{ value.doctors_note }}</th>
+        <th scope="row">{{ value.lab_results }}</th>
+        <th scope="row">{{ value.scan_results }}</th>
+        <th scope="row">{{ value.neuro_sugery_details }}</th>
+        <th scope="row">{{ value.hospital_name }}</th>
+
+
+    </tr>
+        
+    {% endfor %}
+
+    </tbody>
+</table>
+{% else %}
+
+<h4>No records available for this patient ! </h4>
+
+{% endif %}
+
+{% endblock content %}
