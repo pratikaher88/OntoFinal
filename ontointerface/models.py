@@ -1,4 +1,5 @@
 from django.db import models
+from django import forms
 
 # Create your models here.
 
@@ -50,13 +51,15 @@ DATA_CHOICES = (
     ('Cardio','CardioData'),
 )
 
+CHOICES=[('YES','YES'),
+        ('NO','NO')]
+
 class UserInputFormModel(models.Model):
 
     patient_id = models.CharField(max_length=500)
     inquirer = models.CharField(max_length=100, choices=INQUIRER_CHOICES, default='ADMIN')
     data_requested = models.CharField(max_length=100, choices=DATA_CHOICES, default='Neuraldata')
 
-    
     
 
 

@@ -9,6 +9,7 @@ from Ontodesign.settings import GET_LOCATION_BY_IP, CENTER_POINT_LAT, CENTER_POI
 from math import radians, cos, sin, asin, sqrt
 from itertools import chain
 from ontointerface.dataprocessed import data_processed
+import datetime
 
 from owlready2 import *
 
@@ -58,10 +59,10 @@ class SparqlQueries:
 
         try:
             my_world.get_ontology(
-                        "/Users/pratikaher/ontologies/TT2.owl").load()
+                        "ALL.owl").load()
         except:
             my_world.get_ontology(
-                        "/Users/pratikaher/ontologies/TT2.owl").load()
+                        "ALL.owl").load()
 
         
         sync_reasoner(my_world)  # reasoner is started and synchronized here
@@ -130,12 +131,14 @@ def index(request):
             pid = form.cleaned_data['patient_id']
             data_requested = form.cleaned_data['data_requested']
             inquirer = form.cleaned_data['inquirer']
+            emergency_request = form.cleaned_data['emergency_request']
 
+            print(emergency_request)
 
-            if query_output(data_requested, "Inquirer") and is_inside() and data_processed(inquirer):
-                
+            if (query_output(data_requested, "Inquirer") and is_inside() and data_processed(inquirer)) or emergency_request == "YES":
+
                 return access_granted(request, pid, data_requested)
-                # ={'product_id': 1})
+
             else:
                 return redirect('ontointerface:access_denied')
             
@@ -172,9 +175,13 @@ def access_granted(request, pid, data_requested):
 
     hospital1_data = requested_object.objects.using('hospital1').filter(patient_id=pid)
 
+    start = datetime.datetime.now()
     hospital2_data = requested_object.objects.using('hospital2').filter(patient_id=pid)
+    print("Postgres time", datetime.datetime.now() - start)
 
+    start = datetime.datetime.now()
     mongo_data = requested_object.objects.using('mongo').filter(patient_id=pid)
+    print("Mongo", datetime.datetime.now() - start)
 
     # print(hospital1_data, hospital2_data)
 
